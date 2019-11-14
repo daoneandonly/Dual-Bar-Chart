@@ -6,9 +6,14 @@ const render = data => {
   const xValue = d => d.time;
   const yValue = d => d.percentage;
 
-  const margin = { top: 10, right: 10, bottom: 50, left: 100 };
+  const margin = { top: 50, right: 20, bottom: 30, left: 50 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
+
+  const title = 'Energie Besparing in BPH in 2019 ten opzicht van 2018'
+  const yAxisUnit = '%'
+
+  const axisMargin = 1.2
 
   const xScale = d3.scaleBand()
     .domain(data.map(d => d.time))
@@ -16,36 +21,78 @@ const render = data => {
     .padding(0.1);
 
   const yScale = d3.scaleLinear()
-    .domain([d3.max(data, d => d.percentage), d3.min(data, d => d.percentage)])
-    .range([0, innerHeight]);
+    .domain([d3.max(data, d => yValue(d)) * axisMargin, d3.min(data, d => yValue(d)) > 0 ? 0 : d3.min(data, d => yValue(d)) * axisMargin])
+    .range([0, innerHeight])
+    .nice();
 
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
-  const xAxis = d3.axisBottom(xScale);
-  const xAxisG  = g.append('g')
-    .call(xAxis)
-    .attr('transform', `translate(0,${innerHeight})`);
+  g.append('text')
+    .attr('class', 'title')
+    .text(title)
+    .attr('x', 20)
+    .attr('y', -15)
+    .attr('font-weight', '600')
 
-  const yAxis = d3.axisLeft(yScale);
+  const yAxis = d3.axisLeft(yScale)
+    .tickSize(-innerWidth);
+
   const yAxisG = g.append('g').call(yAxis)
+
+  yAxisG.selectAll('.tick line')
+    .attr('opacity', 0.3)
+
+  yAxisG.selectAll('.tick text')
+    .attr('font-size', '1.5em')
+    .attr('x', -10)
+    .text(d => d = d+ yAxisUnit)
+
 
   g.selectAll('rect').data(data)
     .enter().append('rect')
-      .attr('height', d => innerHeight - yScale(yValue(d)))
+      .attr('class', d => yValue(d) > 0 ? 'bar--postive' : 'bar--negative')
+      .attr('height', d => Math.abs(yScale(yValue(d)) - yScale(0)))
+      .attr('y', d => yValue(d) > 0 ? yScale(yValue(d)) : yScale(0))
       .attr('width', xScale.bandwidth())
       .attr('x', d => xScale(xValue(d)))
-      .attr('y', d => yScale(yValue(d)))
       .attr('fill', 'steelblue')
 
+
+  g.selectAll('rect')
+    .append('text')
+      .text( d => yValue(d))
+      .attr('x', 100)
+      .attr('y', 100)
+      .attr('font-size', '1em');
+
+  const xAxis = d3.axisBottom(xScale);
+  const xAxisG  = g.append('g')
+    .call(xAxis)
+    .attr('transform', `translate(0,${yScale(0)})`)
+      .attr('font-size', '1.2em')
+      .attr('font-weight', '600')
+
+  xAxisG.selectAll('.domain')
+    .attr('stroke-width', '1.2')
+  xAxisG.selectAll('.tick line')
+    .remove()
+  xAxisG.selectAll('text')
+    .attr('opacity', 0.8)
 };
 
 d3.csv("src/data/data.csv").then(data => {
   data.forEach(d => {
-    d.time = new Date(d.time).getMonth() + 1;
+    d.time = createMonth(new Date(d.time).getMonth());
     d.percentage = +d.percentage;
-    d.jaar2018 = +d.jaar2018;
-    d.jaar2019 = +d.jaar2019;
+    d.jaar2018 = d.jaar2018;
+    d.jaar2019 = d.jaar2019;
   });
   render(data);
 });
+
+
+const createMonth = function (monthNumber) {
+  let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+  return monthList[monthNumber]
+}
