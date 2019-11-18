@@ -10,7 +10,7 @@ const render = data => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const title = 'Energie Besparing in BPH in 2019 ten opzicht van 2018'
+  const title = 'Energieverbruik in BPH in 2019 ten opzicht van 2018'
   const yAxisUnit = '%'
 
   const axisMargin = 1.2
