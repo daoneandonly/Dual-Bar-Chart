@@ -5,14 +5,14 @@ svg * {
 svg {
 background-color: rgb(245,245,245);
 }
-
+/* 
 .bar--postive{
   fill: rgb(219,43,39);
 }
 
 .bar--negative{
   fill: rgb(85,183,72);
-}
+} */
 
 .title {
   font-family: Open Sans, sans-serif;

@@ -4,16 +4,23 @@ const height = +svg.attr("height");
 
 const render = data => {
   const xValue = d => d.time;
-  const yValue = d => d.percentage;
+  const yValue = d => d.jaar2018;
+  const yValueTwo = d => d.jaar2019;
 
-  const margin = { top: 50, right: 20, bottom: 30, left: 50 };
+  const margin = { top: 50, right: 20, bottom: 70, left: 80 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
   const title = 'Energieverbruik in BPH in 2019 ten opzicht van 2018'
-  const yAxisUnit = '%'
+  const yAxisUnit = 'kwh'
 
-  const axisMargin = 1.2
+  const axisMargin = 1
+
+  const legendSize = 25
+  const colorValueOne = 'steelBlue'
+  const colorValueTwo = 'lightblue'
+
+  // creating scales
 
   const xScale = d3.scaleBand()
     .domain(data.map(d => d.time))
@@ -28,6 +35,8 @@ const render = data => {
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
+  // creating Title
+
   g.append('text')
     .attr('class', 'title')
     .text(title)
@@ -35,8 +44,10 @@ const render = data => {
     .attr('y', -15)
     .attr('font-weight', '600')
 
+  // creating y-axis
+
   const yAxis = d3.axisLeft(yScale)
-    .tickSize(-innerWidth);
+    .tickSize(-innerWidth)
 
   const yAxisG = g.append('g').call(yAxis)
 
@@ -46,18 +57,29 @@ const render = data => {
   yAxisG.selectAll('.tick text')
     .attr('font-size', '1.5em')
     .attr('x', -10)
-    .text(d => d = d+ yAxisUnit)
 
+  yAxis.tickFormat('.4n')
 
-  g.selectAll('rect').data(data)
-    .enter().append('rect')
-      .attr('class', d => yValue(d) > 0 ? 'bar--postive' : 'bar--negative')
+  // creating Bars
+
+  const bars = g.selectAll('rect').data(data)
+    .enter()
+
+  bars.append('rect')
+      .attr('class', d => yValue(d) > 0 ? 'bar--negative': 'bar--postive')
       .attr('height', d => Math.abs(yScale(yValue(d)) - yScale(0)))
       .attr('y', d => yValue(d) > 0 ? yScale(yValue(d)) : yScale(0))
-      .attr('width', xScale.bandwidth())
+      .attr('width', xScale.bandwidth() /2)
       .attr('x', d => xScale(xValue(d)))
-      .attr('fill', 'steelblue')
+      .attr('fill', colorValueOne)
 
+  bars.append('rect').data(data)
+      .attr('class', d => yValueTwo(d) > 0 ? 'bar--negative': 'bar--postive')
+      .attr('height', d => Math.abs(yScale(yValueTwo(d)) - yScale(0)))
+      .attr('y', d => yValueTwo(d) > 0 ? yScale(yValueTwo(d)) : yScale(0))
+      .attr('width', xScale.bandwidth()/2)
+      .attr('x', d => xScale(xValue(d)) + xScale.bandwidth() /2)
+      .attr('fill', 'lightblue')
 
   g.selectAll('rect')
     .append('text')
@@ -65,6 +87,8 @@ const render = data => {
       .attr('x', 100)
       .attr('y', 100)
       .attr('font-size', '1em');
+
+  // Placing X-Axis on top of chart
 
   const xAxis = d3.axisBottom(xScale);
   const xAxisG  = g.append('g')
@@ -79,14 +103,44 @@ const render = data => {
     .remove()
   xAxisG.selectAll('text')
     .attr('opacity', 0.8)
+
+  // Creating a Legend
+
+  const legend = g.append('g')
+    .attr('class','legend')
+    .attr('transform', `translate(${innerWidth - 200}, ${innerHeight + 35})`)
+
+  const legendOne = legend.append('g')
+  legendOne.append('rect')
+    .attr('height', legendSize)
+    .attr('width', legendSize)
+    .attr('fill', colorValueOne)
+
+  legendOne.append('text')
+    .text('2018')
+    .attr('y', legendSize / 1.5)
+    .attr('x', legendSize * 1.5)
+
+  const legendTwo = legend.append('g')
+    .attr('transform', 'translate(100,0)')
+
+  legendTwo.append('rect')
+    .attr('height', legendSize)
+    .attr('width', legendSize)
+    .attr('fill', colorValueTwo)
+
+  legendTwo.append('text')
+    .text('2019')
+    .attr('y', legendSize / 1.5)
+    .attr('x', legendSize * 1.5)
 };
 
 d3.csv("src/data/data.csv").then(data => {
   data.forEach(d => {
     d.time = createMonth(new Date(d.time).getMonth());
     d.percentage = +d.percentage;
-    d.jaar2018 = d.jaar2018;
-    d.jaar2019 = d.jaar2019;
+    d.jaar2018 = d.jaar2018 / 1000;
+    d.jaar2019 = d.jaar2019 / 1000;
   });
   render(data);
 });
