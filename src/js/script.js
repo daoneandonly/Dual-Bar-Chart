@@ -2,16 +2,20 @@ const svg = d3.select("svg");
 const width = +svg.attr("width");
 const height = +svg.attr("height");
 
+const factor = 1000;
+
 const render = data => {
   const xValue = d => d.time;
-  const yValue = d => d.jaar2018;
-  const yValueTwo = d => d.jaar2019;
+  const yValue = d => d.value1;
+  const yValueTwo = d => d.value2;
 
   const margin = { top: 50, right: 20, bottom: 70, left: 80 };
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const title = 'Energieverbruik in BPH in 2019 en 2018';
+  const title = 'Gasverbruik in BPH in 2018 en 2019';
+  const yAxisTitle = "Gas";
+  const unit = "m3";
 
   const axisMargin = 1;
 
@@ -26,8 +30,13 @@ const render = data => {
     .range([0, innerWidth])
     .padding(0.1);
 
+      // Looking if there are negative values
   const yScale = d3.scaleLinear()
-    .domain([d3.max(data, d => yValueTwo(d)) * axisMargin, d3.min(data, d => yValueTwo(d)) > 0 ? 0 : d3.min(data, d => yValue(d)) * axisMargin])
+    .domain([
+      d3.max(data, d => yValueTwo(d)) * axisMargin,
+      d3.min(data, d => yValueTwo(d)) > 0 ?
+        0 : d3.min(data, d => yValue(d)) * axisMargin
+      ])
     .range([0, innerHeight])
     .nice();
 
@@ -60,7 +69,7 @@ const render = data => {
   yAxis.tickFormat('.4n');
 
   yAxisG.append('text')
-   .text('Elektriciteit in 1000 kWh')
+   .text(yAxisTitle + ' in ' + factor + " " + unit)
    .attr('transform', 'rotate(-90)')
    .attr('x', 0 - innerHeight/5)
    .attr('font-size', 18)
@@ -144,7 +153,7 @@ const render = data => {
     .attr('x', legendSize * 1.5);
 };
 
-d3.csv("src/data/data_BPH_Gas_2018-2019.csv").then(data => {
+d3.csv("src/data/data_raw.csv").then(data => {
 
   const formatTime = d3.timeFormat('%-d/%-m/%Y');
   const createMonth = function (monthNumber) {
@@ -153,11 +162,20 @@ d3.csv("src/data/data_BPH_Gas_2018-2019.csv").then(data => {
   }
 
   data.forEach(d => {
+    Object.keys(d).forEach((a, i ) => {
+      if(a != "Tijdstip vanaf"){
+        d["value" + i]= +d[a] / factor
+      } else{
+        return;
+      };
+    });
+
+    d.time = d["Tijdstip vanaf"]
     let time = formatTime(new Date(d.time));
     d.time = createMonth(new Date(time).getMonth());
     d.percentage = +d.percentage;
-    d.jaar2018 = d.jaar2018 / 1000;
-    d.jaar2019 = d.jaar2019 / 1000;
+    d.jaar2018 = d.jaar2018 / factor;
+    d.jaar2019 = d.jaar2019 / factor;
   });
   render(data);
 });
