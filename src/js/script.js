@@ -60,6 +60,14 @@ const render = data => {
 
   yAxis.tickFormat('.4n')
 
+  yAxisG.append('text')
+   .text('Elektriciteit in 1000 kWh')
+   .attr('transform', 'rotate(-90)')
+   .attr('x', 0 - innerHeight/5)
+   .attr('font-size', 18)
+   .attr('fill', 'black')
+   .attr('y', -50)
+
   // creating Bars
 
   const bars = g.selectAll('rect').data(data)
