@@ -12,13 +12,12 @@ const render = data => {
   const innerHeight = height - margin.top - margin.bottom;
 
   const title = 'Energieverbruik in BPH in 2019 ten opzicht van 2018'
-  const yAxisUnit = 'kwh'
 
   const axisMargin = 1
 
   const legendSize = 25
-  const colorValueOne = 'steelBlue'
-  const colorValueTwo = 'lightblue'
+  const colorValueOne = 'lightblue'
+  const colorValueTwo = 'steelBlue'
 
   // creating scales
 
@@ -87,7 +86,7 @@ const render = data => {
       .attr('y', d => yValueTwo(d) > 0 ? yScale(yValueTwo(d)) : yScale(0))
       .attr('width', xScale.bandwidth()/2)
       .attr('x', d => xScale(xValue(d)) + xScale.bandwidth() /2)
-      .attr('fill', 'lightblue')
+      .attr('fill', colorValueTwo)
 
   g.selectAll('rect')
     .append('text')
