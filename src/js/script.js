@@ -11,13 +11,13 @@ const render = data => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const title = 'Energieverbruik in BPH in 2019 en 2018'
+  const title = 'Energieverbruik in BPH in 2019 en 2018';
 
-  const axisMargin = 1
+  const axisMargin = 1;
 
-  const legendSize = 25
-  const colorValueOne = 'lightblue'
-  const colorValueTwo = 'steelBlue'
+  const legendSize = 25;
+  const colorValueOne = 'lightblue';
+  const colorValueTwo = 'steelBlue';
 
   // creating scales
 
@@ -41,23 +41,23 @@ const render = data => {
     .text(title)
     .attr('x', 20)
     .attr('y', -15)
-    .attr('font-weight', '600')
+    .attr('font-weight', '600');
 
   // creating y-axis
 
   const yAxis = d3.axisLeft(yScale)
-    .tickSize(-innerWidth)
+    .tickSize(-innerWidth);
 
-  const yAxisG = g.append('g').call(yAxis)
+  const yAxisG = g.append('g').call(yAxis);
 
   yAxisG.selectAll('.tick line')
-    .attr('opacity', 0.3)
+    .attr('opacity', 0.3);
 
   yAxisG.selectAll('.tick text')
     .attr('font-size', '1.5em')
-    .attr('x', -10)
+    .attr('x', -10);
 
-  yAxis.tickFormat('.4n')
+  yAxis.tickFormat('.4n');
 
   yAxisG.append('text')
    .text('Elektriciteit in 1000 kWh')
@@ -65,12 +65,12 @@ const render = data => {
    .attr('x', 0 - innerHeight/5)
    .attr('font-size', 18)
    .attr('fill', 'black')
-   .attr('y', -50)
+   .attr('y', -50);
 
   // creating Bars
 
   const bars = g.selectAll('rect').data(data)
-    .enter()
+    .enter();
 
   bars.append('rect')
       .attr('class', d => yValue(d) > 0 ? 'bar--negative': 'bar--postive')
@@ -78,7 +78,7 @@ const render = data => {
       .attr('y', d => yValue(d) > 0 ? yScale(yValue(d)) : yScale(0))
       .attr('width', xScale.bandwidth() /2)
       .attr('x', d => xScale(xValue(d)))
-      .attr('fill', colorValueOne)
+      .attr('fill', colorValueOne);
 
   bars.append('rect').data(data)
       .attr('class', d => yValueTwo(d) > 0 ? 'bar--negative': 'bar--postive')
@@ -86,7 +86,7 @@ const render = data => {
       .attr('y', d => yValueTwo(d) > 0 ? yScale(yValueTwo(d)) : yScale(0))
       .attr('width', xScale.bandwidth()/2)
       .attr('x', d => xScale(xValue(d)) + xScale.bandwidth() /2)
-      .attr('fill', colorValueTwo)
+      .attr('fill', colorValueTwo);
 
   g.selectAll('rect')
     .append('text')
@@ -102,44 +102,46 @@ const render = data => {
     .call(xAxis)
     .attr('transform', `translate(0,${yScale(0)})`)
       .attr('font-size', '1.2em')
-      .attr('font-weight', '600')
+      .attr('font-weight', '600');
 
   xAxisG.selectAll('.domain')
-    .attr('stroke-width', '1.2')
+    .attr('stroke-width', '1.2');
+
   xAxisG.selectAll('.tick line')
-    .remove()
+    .remove();
+
   xAxisG.selectAll('text')
-    .attr('opacity', 0.8)
+    .attr('opacity', 0.8);
 
   // Creating a Legend
 
   const legend = g.append('g')
     .attr('class','legend')
-    .attr('transform', `translate(${innerWidth - 200}, ${innerHeight + 35})`)
+    .attr('transform', `translate(${innerWidth - 200}, ${innerHeight + 35})`);
 
   const legendOne = legend.append('g')
   legendOne.append('rect')
     .attr('height', legendSize)
     .attr('width', legendSize)
-    .attr('fill', colorValueOne)
+    .attr('fill', colorValueOne);
 
   legendOne.append('text')
     .text('2018')
     .attr('y', legendSize / 1.5)
-    .attr('x', legendSize * 1.5)
+    .attr('x', legendSize * 1.5);
 
   const legendTwo = legend.append('g')
-    .attr('transform', 'translate(100,0)')
+    .attr('transform', 'translate(100,0)');
 
   legendTwo.append('rect')
     .attr('height', legendSize)
     .attr('width', legendSize)
-    .attr('fill', colorValueTwo)
+    .attr('fill', colorValueTwo);
 
   legendTwo.append('text')
     .text('2019')
     .attr('y', legendSize / 1.5)
-    .attr('x', legendSize * 1.5)
+    .attr('x', legendSize * 1.5);
 };
 
 d3.csv("src/data/data_BPH_Gas_2018-2019.csv").then(data => {
@@ -151,8 +153,7 @@ d3.csv("src/data/data_BPH_Gas_2018-2019.csv").then(data => {
   }
 
   data.forEach(d => {
-    let time = formatTime(new Date(d.time))
-    console.log(new Date (formatTime(new Date(d.time))).getMonth())
+    let time = formatTime(new Date(d.time));
     d.time = createMonth(new Date(time).getMonth());
     d.percentage = +d.percentage;
     d.jaar2018 = d.jaar2018 / 1000;
