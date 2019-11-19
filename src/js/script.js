@@ -11,7 +11,7 @@ const render = data => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const title = 'Energieverbruik in BPH in 2019 ten opzicht van 2018'
+  const title = 'Energieverbruik in BPH in 2019 en 2018'
 
   const axisMargin = 1
 
@@ -27,7 +27,7 @@ const render = data => {
     .padding(0.1);
 
   const yScale = d3.scaleLinear()
-    .domain([d3.max(data, d => yValue(d)) * axisMargin, d3.min(data, d => yValue(d)) > 0 ? 0 : d3.min(data, d => yValue(d)) * axisMargin])
+    .domain([d3.max(data, d => yValueTwo(d)) * axisMargin, d3.min(data, d => yValueTwo(d)) > 0 ? 0 : d3.min(data, d => yValue(d)) * axisMargin])
     .range([0, innerHeight])
     .nice();
 
@@ -142,18 +142,21 @@ const render = data => {
     .attr('x', legendSize * 1.5)
 };
 
-d3.csv("src/data/data.csv").then(data => {
+d3.csv("src/data/data_BPH_Gas_2018-2019.csv").then(data => {
+
+  const formatTime = d3.timeFormat('%-d/%-m/%Y');
+  const createMonth = function (monthNumber) {
+    let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+    return monthList[monthNumber]
+  }
+
   data.forEach(d => {
-    d.time = createMonth(new Date(d.time).getMonth());
+    let time = formatTime(new Date(d.time))
+    console.log(new Date (formatTime(new Date(d.time))).getMonth())
+    d.time = createMonth(new Date(time).getMonth());
     d.percentage = +d.percentage;
     d.jaar2018 = d.jaar2018 / 1000;
     d.jaar2019 = d.jaar2019 / 1000;
   });
   render(data);
 });
-
-
-const createMonth = function (monthNumber) {
-  let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
-  return monthList[monthNumber]
-}
