@@ -1,18 +1,45 @@
-svg * {
+* {
   font-family: Open Sans
 }
 
-svg {
-background-color: rgb(245,245,245);
+body {
+  margin: 0;
+  padding: 0;
 }
-/* 
-.bar--postive{
-  fill: rgb(219,43,39);
+svg {
+background-color:   rgb(245,245,245);
 }
 
-.bar--negative{
-  fill: rgb(85,183,72);
-} */
+main {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+}
+
+main section  {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  font-size: 1.2em;
+}
+
+main section label, main section input {
+  padding: 1em;
+  height: 1.5em;
+}
+
+.result {
+  width: 100%;
+  border-bottom: 2px solid red;
+}
+
 
 .title {
   font-family: Open Sans, sans-serif;

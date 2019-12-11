@@ -1,6 +1,6 @@
 const svg = d3.select("svg");
-const width = +svg.attr("width");
-const height = +svg.attr("height");
+const width =  960;
+const height = 500;
 
 const factor = 1000;
 
@@ -15,36 +15,80 @@ const render = data => {
 
   const title = 'Gasverbruik in BPH in 2018 en 2019';
   const yAxisTitle = "Gas";
-  const unit = "m3";
+  const unit = "Gasverbruik in 1000 m³";
 
-  const axisMargin = 1;
+  const axisMargin = 1.1;
 
   const legendSize = 25;
   const colorValueOne = 'lightblue';
-  const colorValueTwo = 'steelBlue';
+  const colorValueTwo = 'steelblue';
+  const colorLine = 'red'
+
+  const inputValues = [{select: 1.470, range: 1}]
+
+  // update the range of the slider based on max data and selection
+  const updateRange = () => {
+    document.querySelector('input[type=range]').setAttribute(
+      'max',
+      Math.floor(
+        highestYValue() * axisMargin
+        / inputValues[0].select
+      )
+    )
+  }
+
+  // helper function that calcs the highest value of both data sets
+  const highestYValue = () => {
+    a = d3.max(data, d => yValue(d))
+    b = d3.max(data, d => yValueTwo(d))
+    if (a > b) { return a}
+    else { return b}
+  }
+
+  // handling all changes through input
+  const handleInputChange = () => {
+    document.querySelectorAll("select, input").forEach(a => {
+      a.addEventListener('input', (e) => {
+        const selectValue = document.querySelector('select').value
+        const rangeValue = document.querySelector('#rangeSlider').value
+        function checkMultiple(string) {
+          if(rangeValue <= 1){
+            return string}
+          else{
+            return string + "s"
+          }
+        }
+        inputValues[0].select = selectValue / factor
+        inputValues[0].range = rangeValue
+        measureLine
+          .attr('y', yScale(inputValues[0].select * inputValues[0].range))
+        document.querySelector(".result p").innerText = rangeValue + " " + checkMultiple('huishouden') + " (jaarverbruik)"
+        updateRange()
+      })
+    })
+  }
 
   // creating scales
-
   const xScale = d3.scaleBand()
     .domain(data.map(d => d.time))
     .range([0, innerWidth])
-    .padding(0.1);
+    .padding(0.1);  
 
-      // Looking if there are negative values
+  // Looking if there are negative values
   const yScale = d3.scaleLinear()
     .domain([
-      d3.max(data, d => yValueTwo(d)) * axisMargin,
-      d3.min(data, d => yValueTwo(d)) > 0 ?
+      d3.max(data, d => yValue(d)) * axisMargin,
+      d3.min(data, d => yValue(d)) > 0 ?
         0 : d3.min(data, d => yValue(d)) * axisMargin
       ])
     .range([0, innerHeight])
     .nice();
 
+  // appending group that is bound to a margin
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
   // creating Title
-
   g.append('text')
     .attr('class', 'title')
     .text(title)
@@ -53,7 +97,6 @@ const render = data => {
     .attr('font-weight', '600');
 
   // creating y-axis
-
   const yAxis = d3.axisLeft(yScale)
     .tickSize(-innerWidth);
 
@@ -68,33 +111,36 @@ const render = data => {
 
   yAxis.tickFormat('.4n');
 
+  // appending text to y-axis
   yAxisG.append('text')
-   .text(yAxisTitle + ' in ' + factor + " " + unit)
+   .text(unit)
    .attr('transform', 'rotate(-90)')
    .attr('x', 0 - innerHeight/5)
    .attr('font-size', 18)
    .attr('fill', 'black')
    .attr('y', -50);
 
-  // creating Bars
+  // creating Bars with data
+  const barsG = g.append('g')
+    .attr('class', 'bars')
 
-  const bars = g.selectAll('rect').data(data)
+  const bars = barsG.selectAll('rect').data(data)
     .enter();
 
   bars.append('rect')
-      .attr('class', d => yValue(d) > 0 ? 'bar--negative': 'bar--postive')
-      .attr('height', d => Math.abs(yScale(yValue(d)) - yScale(0)))
+      .attr('class', d => yValue(d) > 0 ? 'bar--postive' : 'bar--negative')
       .attr('y', d => yValue(d) > 0 ? yScale(yValue(d)) : yScale(0))
-      .attr('width', xScale.bandwidth() /2)
       .attr('x', d => xScale(xValue(d)))
+      .attr('height', d => Math.abs(yScale(yValue(d)) - yScale(0)))
+      .attr('width', xScale.bandwidth()/2)
       .attr('fill', colorValueOne);
 
   bars.append('rect').data(data)
-      .attr('class', d => yValueTwo(d) > 0 ? 'bar--negative': 'bar--postive')
-      .attr('height', d => Math.abs(yScale(yValueTwo(d)) - yScale(0)))
+      .attr('class', d => yValueTwo(d) > 0 ? 'bar--postive' : 'bar--negative')
       .attr('y', d => yValueTwo(d) > 0 ? yScale(yValueTwo(d)) : yScale(0))
-      .attr('width', xScale.bandwidth()/2)
       .attr('x', d => xScale(xValue(d)) + xScale.bandwidth() /2)
+      .attr('height', d => Math.abs(yScale(yValueTwo(d)) - yScale(0)))
+      .attr('width', xScale.bandwidth()/2)
       .attr('fill', colorValueTwo);
 
   g.selectAll('rect')
@@ -104,8 +150,20 @@ const render = data => {
       .attr('y', 100)
       .attr('font-size', '1em');
 
-  // Placing X-Axis on top of chart
+  const lineG = g.append('g')
+    .attr('class', 'lineG')
 
+  const measureLine = lineG.selectAll('rect').data(inputValues)
+    .enter().append('rect')
+      .attr('width', innerWidth)
+      .attr('height', 2)
+      .attr('x', xScale(0))
+      .attr('y', yScale(1.470))
+      .attr('fill', colorLine)
+      .attr('opacity', 0.8)
+
+
+  // Placing X-Axis on top of chart
   const xAxis = d3.axisBottom(xScale);
   const xAxisG  = g.append('g')
     .call(xAxis)
@@ -122,8 +180,7 @@ const render = data => {
   xAxisG.selectAll('text')
     .attr('opacity', 0.8);
 
-  // Creating a Legend
-
+  // Creating the legend
   const legend = g.append('g')
     .attr('class','legend')
     .attr('transform', `translate(${innerWidth - 200}, ${innerHeight + 35})`);
@@ -151,9 +208,11 @@ const render = data => {
     .text('2019')
     .attr('y', legendSize / 1.5)
     .attr('x', legendSize * 1.5);
+
+  handleInputChange()
 };
 
-d3.csv("src/data/data_raw.csv").then(data => {
+d3.csv("src/data/short-data.csv").then(data => {
 
   const formatTime = d3.timeFormat('%-d/%-m/%Y');
   const createMonth = function (monthNumber) {
@@ -163,14 +222,18 @@ d3.csv("src/data/data_raw.csv").then(data => {
 
   data.forEach(d => {
     Object.keys(d).forEach((a, i ) => {
-      if(a != "Tijdstip vanaf"){
+      if(a != "Tijdstip vanaf" || "time"){
         d["value" + i]= +d[a] / factor
       } else{
         return;
       };
     });
 
-    d.time = d["Tijdstip vanaf"]
+    if (d["Tijdstip vanaf"]) {
+      d.time = d["Tijdstip vanaf"]
+    } else {
+      d.time = d.time
+    }
     let time = formatTime(new Date(d.time));
     d.time = createMonth(new Date(time).getMonth());
     d.percentage = +d.percentage;

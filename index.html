@@ -5,10 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="src/css/styles.css" />
-    <title>Document</title>
+    <title></title>
   </head>
   <body>
-    <svg class="svg" width="960" height="500"></svg>
+    <main>
+      <h1>Hoeveel energie verbruikt de HvA?</h1>
+        <svg class="svg" width="960" height="500"></svg>
+      <section>
+        <p>Vergelijk met</p>
+        <label for="dropDownSelection">Soort</label>
+        <select class="change" id="dropDownSelection" id="">
+          <option value="1470" id="Huishouden">Huishoudens (1470 m³)</option>
+          <option value="500" id="Joe">Joe</option>
+        </select>
+        <label for="rangeSlider">Hoeveelheid</label>
+        <input class="change" id="rangeSlider" name="rangeSlider" type="range" value="1" min="1" max="12" step="1">
+        <section class="result">
+          <p>1 huishouden (jaarvebruik)</p>
+        </section>
+      </section>
+    </main>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="src/js/script.js"></script>
   </body>
