@@ -47,24 +47,36 @@ const render = data => {
 
   // handling all changes through input
   const handleInputChange = () => {
-    document.querySelectorAll("select, input").forEach(a => {
-      a.addEventListener('input', (e) => {
-        const selectValue = document.querySelector('select').value
-        const rangeValue = document.querySelector('#rangeSlider').value
-        function checkMultiple(string) {
-          if(rangeValue <= 1){
-            return string}
-          else{
-            return string + "s"
-          }
-        }
-        inputValues[0].select = selectValue / factor
-        inputValues[0].range = rangeValue
-        measureLine
-          .attr('y', yScale(inputValues[0].select * inputValues[0].range))
-        document.querySelector(".result p").innerText = rangeValue + " " + checkMultiple('huishouden') + " (jaarverbruik)"
-        updateRange()
-      })
+      document.querySelectorAll("select, input").forEach(a => {
+        a.addEventListener('input', (e) => {
+          let selectIndex = document.querySelector('select').value;
+          let rangeValue = document.querySelector('#rangeSlider').value;
+          checkMultiple = (string, additive) => {
+            if(rangeValue <= 1){
+              return string}
+              else{
+                return string + additive;
+              };
+            };
+          let types = [
+              {index: 0, name: checkMultiple('gemiddeld', 'e')+ ' ' + checkMultiple('huishouden','s') + ' (1440 m³ op jaarverbruik)', value: 1440},
+              {index: 2, name: 'flat ' + checkMultiple('huishouden','s') + ' (900 m³ op jaarverbruik)', value: 900},
+              {index: 3, name: 'tussenwoning ' + checkMultiple('huishouden','s') + ' (1350 m³ op jaarverbruik)', value: 2350},
+              {index: 4, name: 'hoekwoning ' + checkMultiple('huishouden','s') + ' (1590 m³ op jaarverbruik)', value: 1590},
+              {index: 5, name: 'twee onder één kap	' + checkMultiple('huishouden','s') + ' (1670 m³ op jaarverbruik)', value: 1670},
+              {index: 6, name: checkMultiple('vrijstaand', 'e') + ' ' + checkMultiple('huishouden','s') + ' (2220 m³ op jaarverbruik)', value: 2220},
+            ];
+          let selectValue = types.filter(obj => {return obj.index == selectIndex})[0]
+          inputValues[0].select = selectValue.value / factor;
+          inputValues[0].range = rangeValue;
+
+          measureLine
+            .attr('y', yScale(inputValues[0].select * inputValues[0].range));
+
+          let resultText = document.querySelector('.result p')
+          resultText.innerText = rangeValue + ' ' + selectValue.name
+          updateRange();
+        })
     })
   }
 
