@@ -1,10 +1,9 @@
 const svg = d3.select("svg");
-const width =  960;
+const width = 960;
 const height = 500;
 
-const factor = 1000;
-
-const render = data => {
+const render = (data,metaData) => {
+  // declaring a variables as set in the metaData object
   const xValue = d => d.time;
   const yValue = d => d.value1;
   const yValueTwo = d => d.value2;
@@ -13,29 +12,30 @@ const render = data => {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
-  const title = 'Gasverbruik in BPH in 2018 en 2019';
-  const yAxisTitle = "Gas";
-  const unit = "Gasverbruik in 1000 m³";
+  const title = metaData.title;
+  const yAxisTitle = metaData.yAxisTitle;
+  const unit = metaData.unit;
 
-  const axisMargin = 1.1;
+  const axisMargin = metaData.axisMargin;
+  const factor = metaData.factor;
 
   const legendSize = 25;
-  const colorValueOne = 'lightblue';
-  const colorValueTwo = 'steelblue';
-  const colorLine = 'red';
+  const colorValueOne = metaData.colors.ValueOne;
+  const colorValueTwo = metaData.colors.ValueTwo;
+  const colorLine = metaData.colors.Line;
 
-  const inputValues = [{select: 1.470, range: 1}]
+  const inputValues = metaData.inputValues;
 
   // update the range of the slider based on max data and selection
   const updateRange = () => {
     let range = document.querySelector('input[type=range]')
     range.max = Math.floor(
         highestYValue() * axisMargin
-        / inputValues[0].select
+        / inputValues.select
       )
   }
 
-  // helper function that calcs the highest value of both data sets
+  // helper function that returns the highest value of both data fields
   const highestYValue = () => {
     a = d3.max(data, d => yValue(d))
     b = d3.max(data, d => yValueTwo(d))
@@ -45,10 +45,13 @@ const render = data => {
 
   // handling all changes through input
   const handleInputChange = () => {
-      document.querySelectorAll("select, input").forEach(a => {
+    // selecting both slider and dropdown
+      document.querySelectorAll('select, input').forEach(a => {
+        // eventlistener that listens to 'input'
         a.addEventListener('input', (e) => {
           let selectIndex = document.querySelector('select').value;
           let rangeValue = document.querySelector('#rangeSlider').value;
+          //helper function that adds string for plural
           checkMultiple = (string, additive) => {
             if(rangeValue <= 1){
               return string}
@@ -56,6 +59,7 @@ const render = data => {
                 return string + additive;
               };
             };
+          // object that defines values and names, corresponding with selection value in html
           let types = [
               {index: 0, name: checkMultiple('gemiddeld', 'e')+ ' ' + checkMultiple('huishouden','s') + ' (1440 m³ op jaarverbruik)', value: 1440},
               {index: 2, name: 'flat ' + checkMultiple('huishouden','s') + ' (900 m³ op jaarverbruik)', value: 900},
@@ -64,15 +68,18 @@ const render = data => {
               {index: 5, name: 'twee onder één kap	' + checkMultiple('huishouden','s') + ' (1670 m³ op jaarverbruik)', value: 1670},
               {index: 6, name: checkMultiple('vrijstaand', 'e') + ' ' + checkMultiple('huishouden','s') + ' (2220 m³ op jaarverbruik)', value: 2220},
             ];
+          // reading the types object and selecting the corresponding one
           let selectValue = types.filter(obj => {return obj.index == selectIndex})[0]
-          inputValues[0].select = selectValue.value / factor;
-          inputValues[0].range = rangeValue;
+          inputValues.select = selectValue.value / factor;
+          inputValues.range = rangeValue;
 
+          // updating measureLine to move according to read values
           measureLine
-            .attr('y', yScale(inputValues[0].select * inputValues[0].range));
-
+            .attr('y', yScale(inputValues.select * inputValues.range));
+          // updating result text in html to values
           let resultText = document.querySelector('.result p')
           resultText.innerText = rangeValue + ' ' + selectValue.name
+          // calling function that updates the selection range based on data
           updateRange();
         })
     })
@@ -163,12 +170,13 @@ const render = data => {
   const lineG = g.append('g')
     .attr('class', 'lineG');
 
-  const measureLine = lineG.selectAll('rect').data(inputValues)
+  // creating inital value of measureLine
+  const measureLine = lineG.selectAll('rect').data([inputValues])
     .enter().append('rect')
       .attr('width', innerWidth)
       .attr('height', 2)
       .attr('x', xScale(0))
-      .attr('y', yScale(1.470))
+      .attr('y', d => yScale(d.select * d.range))
       .attr('fill', colorLine)
       .attr('opacity', 0.8);
 
@@ -222,33 +230,57 @@ const render = data => {
   handleInputChange();
 };
 
-d3.csv("src/data/short-data.csv").then(data => {
+// load data takes a path that points to an CSV file and a metaData object that holds information about the bar chart itself
+const loadData = (dataPath, metaData) => {
+  d3.csv(dataPath).then(data => {
+    let factor = metaData.factor
+    // creating costum format
+    const formatTime = d3.timeFormat('%-d/%-m/%Y');
+    // function that returns month abbreviation based on index
+    const createMonth = (monthNumber) => {
+      let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+      return monthList[monthNumber]
+    };
 
-  const formatTime = d3.timeFormat('%-d/%-m/%Y');
-  const createMonth = function (monthNumber) {
-    let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
-    return monthList[monthNumber]
-  };
+    // refactors each point in data
+    data.forEach(d => {
+      // function that devides data by a factor, except for time.
+      Object.keys(d).forEach((a, i ) => {
+        if(a != 'Tijdstip vanaf' || 'time'){
+          d['value' + i]= +d[a] / factor
+        } else{
+          return;
+        };
+      });
 
-  data.forEach(d => {
-    Object.keys(d).forEach((a, i ) => {
-      if(a != "Tijdstip vanaf" || "time"){
-        d["value" + i]= +d[a] / factor
-      } else{
-        return;
+      // renames the default 'Tijdstip vanaf' value as d.time
+      if (d['Tijdstip vanaf']) {
+        d.time = d['Tijdstip vanaf']
+      } else {
+        d.time = d.time;
       };
+
+      // reformats time replaces it with a month value
+      let time = formatTime(new Date(d.time));
+      d.time = createMonth(new Date(time).getMonth());
     });
 
-    if (d["Tijdstip vanaf"]) {
-      d.time = d["Tijdstip vanaf"]
-    } else {
-      d.time = d.time;
-    };
-    let time = formatTime(new Date(d.time));
-    d.time = createMonth(new Date(time).getMonth());
-    d.percentage = +d.percentage;
-    d.jaar2018 = d.jaar2018 / factor;
-    d.jaar2019 = d.jaar2019 / factor;
+    // Call render data function
+    render(data,metaData);
   });
-  render(data);
+};
+
+// run loadData
+loadData('src/data/short-data.csv', {
+  title: 'Gasverbruik in BPH in 2018 en 2019',
+  unit: 'Gasverbruik in 1000 m³',
+  yAxisTitle: 'Gas',
+  axisMargin: 1.1,
+  factor: 1000,
+  colors: {
+    ValueOne: 'lightblue',
+    ValueTwo: 'steelblue',
+    Line: 'red'
+  },
+  inputValues: {select: 1.470, range: 1}
 });
