@@ -22,19 +22,17 @@ const render = data => {
   const legendSize = 25;
   const colorValueOne = 'lightblue';
   const colorValueTwo = 'steelblue';
-  const colorLine = 'red'
+  const colorLine = 'red';
 
   const inputValues = [{select: 1.470, range: 1}]
 
   // update the range of the slider based on max data and selection
   const updateRange = () => {
-    document.querySelector('input[type=range]').setAttribute(
-      'max',
-      Math.floor(
+    let range = document.querySelector('input[type=range]')
+    range.max = Math.floor(
         highestYValue() * axisMargin
         / inputValues[0].select
       )
-    )
   }
 
   // helper function that calcs the highest value of both data sets
@@ -78,13 +76,13 @@ const render = data => {
           updateRange();
         })
     })
-  }
+  };
 
   // creating scales
   const xScale = d3.scaleBand()
     .domain(data.map(d => d.time))
     .range([0, innerWidth])
-    .padding(0.1);  
+    .padding(0.1);
 
   // Looking if there are negative values
   const yScale = d3.scaleLinear()
@@ -134,7 +132,7 @@ const render = data => {
 
   // creating Bars with data
   const barsG = g.append('g')
-    .attr('class', 'bars')
+    .attr('class', 'bars');
 
   const bars = barsG.selectAll('rect').data(data)
     .enter();
@@ -163,7 +161,7 @@ const render = data => {
       .attr('font-size', '1em');
 
   const lineG = g.append('g')
-    .attr('class', 'lineG')
+    .attr('class', 'lineG');
 
   const measureLine = lineG.selectAll('rect').data(inputValues)
     .enter().append('rect')
@@ -172,7 +170,7 @@ const render = data => {
       .attr('x', xScale(0))
       .attr('y', yScale(1.470))
       .attr('fill', colorLine)
-      .attr('opacity', 0.8)
+      .attr('opacity', 0.8);
 
 
   // Placing X-Axis on top of chart
@@ -221,7 +219,7 @@ const render = data => {
     .attr('y', legendSize / 1.5)
     .attr('x', legendSize * 1.5);
 
-  handleInputChange()
+  handleInputChange();
 };
 
 d3.csv("src/data/short-data.csv").then(data => {
@@ -230,7 +228,7 @@ d3.csv("src/data/short-data.csv").then(data => {
   const createMonth = function (monthNumber) {
     let monthList = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
     return monthList[monthNumber]
-  }
+  };
 
   data.forEach(d => {
     Object.keys(d).forEach((a, i ) => {
@@ -244,8 +242,8 @@ d3.csv("src/data/short-data.csv").then(data => {
     if (d["Tijdstip vanaf"]) {
       d.time = d["Tijdstip vanaf"]
     } else {
-      d.time = d.time
-    }
+      d.time = d.time;
+    };
     let time = formatTime(new Date(d.time));
     d.time = createMonth(new Date(time).getMonth());
     d.percentage = +d.percentage;
