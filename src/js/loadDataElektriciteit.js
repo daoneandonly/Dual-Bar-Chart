@@ -1,11 +1,12 @@
 // run loadData for the elecktriciteit dataset
-loadData('src/data/data_elektriciteit.csv', {
+loadData('src/data/data_BPH_elektriciteit_2018-2019.csv', {
   title: 'Elektriciteit in BPH in 2018 en 2019',
   unit: 'Elektriciteit in 1000 kWh',
   yAxisTitle: 'Gas',
   axisMargin: 1.1,
   factor: 1000,
   countLimit: 6,
+  removeIncompleteData: false,
   colors: {
     ValueOne: 'rgba(179,150,173,1)',
     ValueTwo: 'rgba(104,73,100,1)',

@@ -67,6 +67,7 @@ const render = (data,metaData) => {
               {index: 4, name: 'hoekwoning ' + checkMultiple('huishouden','s') + ' (1590 m³ op jaarverbruik)', value: 1590},
               {index: 5, name: 'twee onder één kap	' + checkMultiple('huishouden','s') + ' (1670 m³ op jaarverbruik)', value: 1670},
               {index: 6, name: checkMultiple('vrijstaand', 'e') + ' ' + checkMultiple('huishouden','s') + ' (2220 m³ op jaarverbruik)', value: 2220},
+              {index: 7, name: 'x 1000 km rijden in een Tesla (182 kWh)', value: 182},
             ];
           // reading the types object and selecting the corresponding one
           let selectValue = types.filter(obj => {return obj.index == selectIndex})[0]
@@ -267,6 +268,11 @@ const loadData = (dataPath, metaData) => {
 
     // slice data array if there is a countLimit defined in metaData
     metaData.countLimit < data.length ? data = data.slice(data.length - metaData.countLimit) : null
+
+    // remove incomplete data of export
+    metaData.removeIncompleteData ?
+    data.slice(data.length - 1)[0].value2 = 0
+    : null
 
     // Call render data function
     render(data,metaData);
