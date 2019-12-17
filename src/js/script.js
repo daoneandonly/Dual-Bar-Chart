@@ -265,22 +265,10 @@ const loadData = (dataPath, metaData) => {
       d.time = createMonth(new Date(time).getMonth());
     });
 
+    // slice data array if there is a countLimit defined in metaData
+    metaData.countLimit < data.length ? data = data.slice(data.length - metaData.countLimit) : null
+
     // Call render data function
     render(data,metaData);
   });
 };
-
-// run loadData
-loadData('src/data/short-data.csv', {
-  title: 'Gasverbruik in BPH in 2018 en 2019',
-  unit: 'Gasverbruik in 1000 m³',
-  yAxisTitle: 'Gas',
-  axisMargin: 1.1,
-  factor: 1000,
-  colors: {
-    ValueOne: 'lightblue',
-    ValueTwo: 'steelblue',
-    Line: 'red'
-  },
-  inputValues: {select: 1.470, range: 1}
-});
