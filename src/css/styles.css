@@ -37,7 +37,30 @@ main section label, main section input {
 
 .result {
   width: 100%;
-  border-bottom: 2px solid red;
+  /* border-bottom: 2px solid rgba(189,45,0,1); */
+}
+
+.bttn {
+  display: block;
+  text-decoration: none;
+  font-size: 1.25em;
+  padding: .5em;
+  border: 1px solid rgba(20,20,20,.8);
+  color: black;
+  font-weight: bold;
+}
+
+.bttn:link {
+  background: linear-gradient(rgba(230,230,230,.5), rgba(220,220,220,.5));
+}
+
+.bttn:hover {
+  background: linear-gradient(rgba(230,230,230,1), rgba(220,220,220,1));
+  border: 1px solid rgba(20,20,20,.2);
+}
+
+.bttn:visited {
+  color:inherit;
 }
 
 

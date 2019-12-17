@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="src/css/styles.css" />
-    <title>Hoeveel energie verbruikt de HvA?</title>
+    <title></title>
   </head>
   <body>
     <main>
@@ -15,23 +15,18 @@
         <p>Vergelijk met</p>
         <label for="dropDownSelection">Soort</label>
         <select class="change" id="dropDownSelection" id="">
-          <option value="0" id="Huishouden">Gemiddeld huishouden (1440 m³)</option>
-          <option value="2">Flat (1470 m³)</option>
-          <option value="3">Tussenwoning (1350 m³)</option>
-          <option value="4">Hoekwoning (1590 m³)</option>
-          <option value="5">2 onder 1 kap (1670 m³)</option>
-          <option value="6">Vrijstaande woning (2220 m³)</option>
+          <option value="7"> keer 1000 km rijden in een Tesla</option>
         </select>
         <label for="rangeSlider">Hoeveelheid</label>
         <input class="change" id="rangeSlider" name="rangeSlider" type="range" value="1" min="1" max="12" step="1">
         <section class="result">
-          <p>1 gemiddeld huishouden (1440 m³ op jaarverbruik)</p>
+          <p>1 keer 1000 km rijden in een Tesla</p>
         </section>
       </section>
-      <a href="./elektriciteit.html" class='bttn'>Elektriciteit vergelijken</a>
+      <a href="./" class='bttn'>Gas vergelijken</a>
     </main>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="src/js/script.js"></script>
-    <script src="src/js/loadDataGas.js"></script>
+    <script src="src/js/loadDataElektriciteit.js"></script>
   </body>
 </html>
