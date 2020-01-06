@@ -63,7 +63,7 @@ This application was made with these few focusses in mind.
 
 ## Future refactors
 
-* ``let types = {...}`` should be an external variable instead of being defined in ``script.js``
+* ``let types = {...}`` should be an external variable instead of being defined in ``script.js`` [(here)](https://github.com/daoneandonly/Dual-Bar-Chart/blob/432eefe196ea22ffc01494c68a1caa8af5474054/src/js/script.js#L63)
 * The dropdown should be generated based on ``let types = {...}``. This could work through the metaData object.
 * Translate entire graph in English. Dutch just doesn't do this graph justice.
 
@@ -76,6 +76,6 @@ This application was made with these few focusses in mind.
 
 ## License
 
-[MIT License](../blob/master/LICENSE)
+[MIT License](../master/LICENSE)
 
 Copyright (c) 2019 Steven Whitton
